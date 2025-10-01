@@ -20,6 +20,14 @@
     } \
 } while(0)
 
+#define NCCLCHECK(cmd) do { \
+    ncclResult_t r = cmd; \
+    if (r != ncclSuccess) { \
+        fprintf(stderr, "NCCL error %s:%d '%s'\n", __FILE__, __LINE__, ncclGetErrorString(r)); \
+        exit(EXIT_FAILURE); \
+    } \
+} while(0)
+
 int main(int argc, char *argv[]) {
     int size = 32 * 1024 * 1024;  // buffer size
     int myRank, nRanks, localRank = 0;
@@ -36,7 +44,7 @@ int main(int argc, char *argv[]) {
 
     // Rank 0 generates the NCCL unique ID
     if (myRank == 0) {
-        ncclGetUniqueId(&id);
+        NCCLCHECK(ncclGetUniqueId(&id));
     }
 
     // Broadcast the NCCL unique ID to all ranks
@@ -45,15 +53,21 @@ int main(int argc, char *argv[]) {
     // Optional: print to confirm all ranks received it
     printf("Rank %d received NCCL unique ID\n", myRank);
 
-    // Determine local GPU (here, simple mapping rank -> device)
-    localRank = myRank; // for single node with 2 ranks
-    CUDACHECK(cudaSetDevice(0));
+    CUDACHECK(cudaSetDevice(localRank));
 
     // Allocate device buffers
     CUDACHECK(cudaMalloc(&sendbuff, size * sizeof(float)));
-    CUDACHECK(cudaMalloc(&recvbuff, size * sizeof(float)));
+    CUDACHECK(cudaMalloc(&recvbuff, size * nRanks * sizeof(float))); // Allgather needs space for all ranks
     CUDACHECK(cudaStreamCreate(&s));
 
+    // Initialize NCCL communicator
+    NCCLCHECK(ncclCommInitRank(&comm, nRanks, id, myRank));
+
+    // Example: Initialize send buffer with some values
+    // (for demonstration, could be random or rank-specific)
+    CUDACHECK(cudaMemset(sendbuff, myRank, size * sizeof(float)));
+
+    // Perform NCCL AllGather
     NCCLCHECK(ncclAllGather(
         (const void*)sendbuff,     // send buffer
         (void*)recvbuff,           // receive buffer
@@ -68,16 +82,11 @@ int main(int argc, char *argv[]) {
 
     printf("Rank %d completed NCCL AllGather\n", myRank);
 
-    // Initialize NCCL communicator
-    ncclCommInitRank(&comm, nRanks, id, myRank);
-
-    // Now you can use NCCL to communicate between GPUs
-
     // Cleanup
-    ncclCommDestroy(comm);
-    cudaFree(sendbuff);
-    cudaFree(recvbuff);
-    cudaStreamDestroy(s);
+    NCCLCHECK(ncclCommDestroy(comm));
+    CUDACHECK(cudaFree(sendbuff));
+    CUDACHECK(cudaFree(recvbuff));
+    CUDACHECK(cudaStreamDestroy(s));
     MPICHECK(MPI_Finalize());
 
     return 0;
