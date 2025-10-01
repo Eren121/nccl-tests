@@ -26,4 +26,4 @@ RUN apt -y install sshpass
 WORKDIR /root
 COPY init_ssh.sh hosts.txt .
 
-ENTRYPOINT $HOME/init_ssh.sh && bash
+ENTRYPOINT bash
