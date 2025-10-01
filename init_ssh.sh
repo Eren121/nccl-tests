@@ -1,11 +1,13 @@
 #!/bin/sh
 
+cd "$HOME"
+mkdir -p .ssh
+
 service ssh restart
-ssh-keygen -t rsa -b 4096 -N "" -f "$HOME/.ssh/id_rsa"
+ssh-keygen -t rsa -b 4096 -N "" -f ".ssh/id_rsa"
 
 # Populate .ssh/config
-mkdir -p $HOME/.ssh
-awk '{print "Host "$1"\n    HostName "$2"\n    Port 1954\n"}' hosts.txt >> $HOME/.ssh/config
+awk '{print "Host "$1"\n    HostName "$2"\n    Port 1954\n"}' hosts.txt >> .ssh/config
 
 copy_ssh_key()
 {
