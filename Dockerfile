@@ -1,5 +1,9 @@
 FROM nvcr.io/nvidia/doca/doca:3.1.0-devel-cuda12.8.0-host
 
+# https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/env.html
+ARG NCCL_IB_HCA
+ARG NCCL_IB_GID_INDEX
+
 RUN apt-get -y update && apt-get -y upgrade
 RUN apt-get -y install openmpi-bin openmpi-common libopenmpi-dev librdmacm-dev libpsm2-dev openmpi-bin libopenmpi-dev git sshpass
 
@@ -27,6 +31,9 @@ COPY home/ /root/
 ENV PATH="/usr/mpi/gcc/openmpi-4.1.9a1/bin:$PATH"
 ENV LD_LIBRARY_PATH="/usr/mpi/gcc/openmpi-4.1.9a1/lib:$LD_LIBRARY_PATH"
 
-ENV xx=10
+RUN mkdir -p /root/.ssh && \
+    echo "NCCL_IB_GID_INDEX=${NCCL_IB_GID_INDEX}" >> /root/.ssh/environment && \
+    echo "NCCL_IB_HCA=${NCCL_IB_HCA}" >> /root/.ssh/environment && \
+    chmod 600 /root/.ssh/environment
 
 ENTRYPOINT $HOME/init_ssh.sh && make -C $HOME/cpp && bash
