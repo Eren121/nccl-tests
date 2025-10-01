@@ -1,4 +1,4 @@
-FROM nvidia/cuda:13.0.1-cudnn-devel-ubuntu24.04
+FROM nvcr.io/nvidia/doca/doca:3.1.0-devel-cuda12.8.0-host
 
 RUN apt-get -y update
 RUN apt-get -y install openmpi-bin openmpi-common libopenmpi-dev librdmacm-dev libpsm2-dev openmpi-bin libopenmpi-dev git

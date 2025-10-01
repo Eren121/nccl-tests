@@ -10,4 +10,5 @@ image:
 run:
 	docker run --net=host --gpus=all -it --rm  -w $(HOME) \
                 $(DEV_OPT) --device=/dev/infiniband/rdma_cm \
+		--ulimit memlock=819200000:819200000 \
                 --mount type=bind,src=$(HOME),dst=$(HOME) my_nccl
