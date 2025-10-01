@@ -7,6 +7,8 @@ WORKDIR /app/nccl-tests
 RUN git clone https://github.com/NVIDIA/nccl-tests .
 RUN make -j MPI=1 MPI_HOME=/usr/lib/x86_64-linux-gnu/openmpi/
 
+ENV OMPI_ALLOW_RUN_AS_ROOT=1 
+ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 #
 # ssh-server
 #
