@@ -1,7 +1,7 @@
 FROM nvcr.io/nvidia/doca/doca:3.1.0-devel-cuda12.8.0-host
 
-RUN apt-get -y update
-RUN apt-get -y install openmpi-bin openmpi-common libopenmpi-dev librdmacm-dev libpsm2-dev openmpi-bin libopenmpi-dev git
+RUN apt-get -y update && apt-get -y upgrade
+RUN apt-get -y install openmpi-bin openmpi-common libopenmpi-dev librdmacm-dev libpsm2-dev openmpi-bin libopenmpi-dev git sshpass
 
 WORKDIR /app/nccl-tests
 RUN git clone https://github.com/NVIDIA/nccl-tests .
@@ -13,8 +13,7 @@ ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 # ssh-server
 #
 
-RUN apt-get install -y openssh-server
-RUN apt-get install -y vim nano
+RUN apt-get install -y openssh-server vim nano
 RUN echo "root:root" | chpasswd
 
 RUN mkdir /var/run/sshd && \
@@ -22,8 +21,6 @@ RUN mkdir /var/run/sshd && \
 
 RUN echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
 
-RUN apt -y install sshpass
-WORKDIR /root
-COPY init_ssh.sh hosts.txt .
+COPY home/* /root/
 
 ENTRYPOINT $HOME/init_ssh.sh && bash
