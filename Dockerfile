@@ -21,7 +21,7 @@ RUN apt-get install -y openssh-server vim nano
 RUN echo "root:root" | chpasswd
 
 RUN mkdir /var/run/sshd && \
-    sed -i 's/#Port 22/Port 1954/' /etc/ssh/sshd_config
+    sed -i 's/#Port 22/Port 1954/' /etc/ssh/sshd_config \
     sed -i 's/#PermitUserEnvironment no/PermitUserEnvironment yes/' /etc/ssh/sshd_config
 
 RUN echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
