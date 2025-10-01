@@ -22,6 +22,7 @@ RUN echo "root:root" | chpasswd
 
 RUN mkdir /var/run/sshd && \
     sed -i 's/#Port 22/Port 1954/' /etc/ssh/sshd_config
+    sed -i 's/#PermitUserEnvironment no/PermitUserEnvironment yes/' /etc/ssh/sshd_config
 
 RUN echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
 
@@ -35,5 +36,8 @@ RUN mkdir -p /root/.ssh && \
     echo "NCCL_IB_GID_INDEX=${NCCL_IB_GID_INDEX}" >> /root/.ssh/environment && \
     echo "NCCL_IB_HCA=${NCCL_IB_HCA}" >> /root/.ssh/environment && \
     chmod 600 /root/.ssh/environment
+
+ENV NCCL_IB_GID_INDEX=${NCCL_IB_GID_INDEX}
+ENV NCCL_IB_HCA=${NCCL_IB_HCA}
 
 ENTRYPOINT $HOME/init_ssh.sh && make -C $HOME/cpp && bash
