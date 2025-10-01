@@ -15,4 +15,4 @@ a.out:
 	    -lnccl
 
 mpirun:
-	 mpirun --pernode --host nccl-smartedge,nccl-hpe /root/cpp/main
+	 mpirun -x NCCL_DEBUG=INFO --pernode --host nccl-smartedge,nccl-hpe /root/cpp/main
