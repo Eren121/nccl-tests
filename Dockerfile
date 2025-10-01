@@ -22,4 +22,9 @@ RUN mkdir /var/run/sshd && \
 
 RUN echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
 
-ENTRYPOINT service ssh restart && bash
+RUN apt -y install sshpass
+WORKDIR /root
+COPY dot_ssh_config ./.ssh/config
+COPY init_ssh.sh .
+
+ENTRYPOINT $HOME/init_ssh.sh && bash

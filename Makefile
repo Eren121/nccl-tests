@@ -9,6 +9,7 @@ image:
 .PHONY: run
 run:
 	docker run --net=host --gpus=all -it --rm  -w $(HOME) \
-                $(DEV_OPT) --device=/dev/infiniband/rdma_cm \
-		--ulimit memlock=819200000:819200000 \
+		--add-host nccl-hpe:192.168.120.1 \
+		--add-host nccl-smartedge:192.168.120.2 \
+			$(DEV_OPT) --device=/dev/infiniband/rdma_cm \
                 --mount type=bind,src=$(HOME),dst=$(HOME) my_nccl

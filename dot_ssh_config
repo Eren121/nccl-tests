@@ -1,0 +1,5 @@
+Host nccl-smartedge
+    Port 1954
+
+Host nccl-hpe
+    Port 1954
