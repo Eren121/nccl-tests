@@ -27,4 +27,6 @@ COPY home/ /root/
 ENV PATH="/usr/mpi/gcc/openmpi-4.1.9a1/bin:$PATH"
 ENV LD_LIBRARY_PATH="/usr/mpi/gcc/openmpi-4.1.9a1/lib:$LD_LIBRARY_PATH"
 
+ENV xx=10
+
 ENTRYPOINT $HOME/init_ssh.sh && make -C $HOME/cpp && bash
