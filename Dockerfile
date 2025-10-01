@@ -24,7 +24,6 @@ RUN echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
 
 RUN apt -y install sshpass
 WORKDIR /root
-COPY dot_ssh_config ./.ssh/config
-COPY init_ssh.sh .
+COPY init_ssh.sh hosts.txt .
 
 ENTRYPOINT $HOME/init_ssh.sh && bash
