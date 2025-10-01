@@ -13,3 +13,6 @@ a.out:
 	    -Xcompiler "$(MPI_COMPILE_FLAGS)" \
 	    $(MPI_LINK_FLAGS) \
 	    -lnccl
+
+mpirun:
+	 mpirun --pernode --host nccl-smartedge,nccl-hpe /root/cpp/main

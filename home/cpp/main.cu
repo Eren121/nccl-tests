@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
 
     // Determine local GPU (here, simple mapping rank -> device)
     localRank = myRank; // for single node with 2 ranks
-    CUDACHECK(cudaSetDevice(localRank));
+    CUDACHECK(cudaSetDevice(0));
 
     // Allocate device buffers
     CUDACHECK(cudaMalloc(&sendbuff, size * sizeof(float)));
