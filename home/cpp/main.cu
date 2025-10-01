@@ -58,12 +58,16 @@ int main(int argc, char *argv[]) {
     // Allocate device buffers
     CUDACHECK(cudaMalloc(&sendbuff, size * sizeof(float)));
     CUDACHECK(cudaMalloc(&recvbuff, size * nRanks * sizeof(float))); // Allgather needs space for all ranks
+
+    CUDACHECK(cudaMemset(sendbuff, 0, size * sizeof(float)));
+    CUDACHECK(cudaMemset(recvbuff, 0, size * sizeof(float)));
+
     CUDACHECK(cudaStreamCreate(&s));
 
     // Initialize NCCL communicator
     NCCLCHECK(ncclCommInitRank(&comm, nRanks, id, myRank));
 
-    // Example: Initialize send buffer with some values
+    // Example: Initialize send buffer wi   th some values
     // (for demonstration, could be random or rank-specific)
     CUDACHECK(cudaMemset(sendbuff, myRank, size * sizeof(float)));
 
