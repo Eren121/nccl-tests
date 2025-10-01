@@ -5,7 +5,7 @@ RUN apt-get -y install openmpi-bin openmpi-common libopenmpi-dev librdmacm-dev l
 
 WORKDIR /app/nccl-tests
 RUN git clone https://github.com/NVIDIA/nccl-tests .
-RUN make -j MPI=1 MPI_HOME=/usr/lib/x86_64-linux-gnu/openmpi/
+RUN make -j MPI=1 MPI_HOME=/usr/mpi/gcc/openmpi-4.1.9a1/
 
 ENV OMPI_ALLOW_RUN_AS_ROOT=1 
 ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
@@ -21,6 +21,10 @@ RUN mkdir /var/run/sshd && \
 
 RUN echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
 
-COPY home/* /root/
+COPY home/ /root/
 
-ENTRYPOINT $HOME/init_ssh.sh && bash
+# Necessary otherwise 'mpirun' is Ubuntu's and not doca's
+ENV PATH="/usr/mpi/gcc/openmpi-4.1.9a1/bin:$PATH"
+ENV LD_LIBRARY_PATH="/usr/mpi/gcc/openmpi-4.1.9a1/lib:$LD_LIBRARY_PATH"
+
+ENTRYPOINT $HOME/init_ssh.sh && make -C $HOME/cpp && bash
