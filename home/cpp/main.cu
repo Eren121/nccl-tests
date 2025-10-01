@@ -54,6 +54,20 @@ int main(int argc, char *argv[]) {
     CUDACHECK(cudaMalloc(&recvbuff, size * sizeof(float)));
     CUDACHECK(cudaStreamCreate(&s));
 
+    NCCLCHECK(ncclAllGather(
+        (const void*)sendbuff,     // send buffer
+        (void*)recvbuff,           // receive buffer
+        size,                      // number of elements per rank
+        ncclFloat,                 // data type
+        comm,                      // NCCL communicator
+        s                          // CUDA stream
+    ));
+
+    // Wait for completion
+    CUDACHECK(cudaStreamSynchronize(s));
+
+    printf("Rank %d completed NCCL AllGather\n", myRank);
+
     // Initialize NCCL communicator
     ncclCommInitRank(&comm, nRanks, id, myRank);
 
