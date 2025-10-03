@@ -32,10 +32,10 @@ COPY home/ /root/
 ENV PATH="/usr/mpi/gcc/openmpi-4.1.9a1/bin:$PATH"
 ENV LD_LIBRARY_PATH="/usr/mpi/gcc/openmpi-4.1.9a1/lib:$LD_LIBRARY_PATH"
 
-RUN mkdir -p /root/.ssh
-    #echo "NCCL_IB_GID_INDEX=${NCCL_IB_GID_INDEX}" >> /root/.ssh/environment && \
-    #echo "NCCL_IB_HCA=${NCCL_IB_HCA}" >> /root/.ssh/environment && \
-    #chmod 600 /root/.ssh/environment
+RUN mkdir -p /root/.ssh && \
+    echo "NCCL_IB_GID_INDEX=${NCCL_IB_GID_INDEX}" >> /root/.ssh/environment && \
+    echo "NCCL_IB_HCA=${NCCL_IB_HCA}" >> /root/.ssh/environment && \
+    chmod 600 /root/.ssh/environment
 
 #ENV NCCL_IB_GID_INDEX=${NCCL_IB_GID_INDEX}
 #ENV NCCL_IB_HCA=${NCCL_IB_HCA}
