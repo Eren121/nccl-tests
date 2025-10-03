@@ -32,6 +32,6 @@ copy_ssh_key()
 copy_ssh_key smartedge
 copy_ssh_key hpe
 
-if [ $(hostname) = "smartedge" ]; then
+if [ "$(hostname)" = "smartedge" ]; then
     mpirun -x NCCL_DEBUG=INFO --pernode --host smartedge,hpe /root/cpp/main
 fi
