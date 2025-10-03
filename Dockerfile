@@ -40,4 +40,6 @@ RUN mkdir -p /root/.ssh && \
 ENV NCCL_IB_GID_INDEX=${NCCL_IB_GID_INDEX}
 ENV NCCL_IB_HCA=${NCCL_IB_HCA}
 
-ENTRYPOINT $HOME/init_ssh.sh && make -C $HOME/cpp && mpirun -x NCCL_DEBUG=INFO --pernode --host smartedge,hpe /root/cpp/main
+RUN make -C $HOME/cpp
+
+ENTRYPOINT $HOME/init_ssh.sh
