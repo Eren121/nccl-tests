@@ -18,7 +18,7 @@ image_hpe:
 
 image_smartedge:
 	docker build \
-		--build-arg NCCL_IB_HCA='=mlx5_1:1' \
+		--build-arg NCCL_IB_HCA='=mlx5_0:1' \
 		--build-arg NCCL_IB_GID_INDEX=3 \
 		-t my_nccl .
 
