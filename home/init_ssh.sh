@@ -29,5 +29,5 @@ copy_ssh_key()
     sshpass -p 'root' ssh-copy-id -o StrictHostKeyChecking=no "$host"
 }
 
-copy_ssh_key nccl-smartedge
-copy_ssh_key nccl-hpe
+copy_ssh_key smartedge
+copy_ssh_key hpe
