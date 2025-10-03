@@ -5,7 +5,7 @@ ARG NCCL_IB_HCA
 ARG NCCL_IB_GID_INDEX
 
 RUN apt-get -y update && apt-get -y upgrade
-RUN apt-get -y install openmpi-bin openmpi-common libopenmpi-dev librdmacm-dev libpsm2-dev openmpi-bin libopenmpi-dev git sshpass
+RUN apt-get -y install openmpi-bin openmpi-common libopenmpi-dev librdmacm-dev libpsm2-dev openmpi-bin libopenmpi-dev git sshpass nsight-compute-2025.3.1
 
 WORKDIR /app/nccl-tests
 RUN git clone https://github.com/NVIDIA/nccl-tests .
