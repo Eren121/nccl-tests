@@ -31,3 +31,5 @@ copy_ssh_key()
 
 copy_ssh_key smartedge
 copy_ssh_key hpe
+
+exec bash

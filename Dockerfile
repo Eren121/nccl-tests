@@ -44,4 +44,4 @@ RUN echo "NCCL_IB_HCA=${NCCL_IB_HCA}" >> /root/.ssh/environment
 RUN chmod 600 /root/.ssh/environment
 RUN make -C $HOME/cpp
 
-ENTRYPOINT $HOME/init_ssh.sh
+CMD $HOME/init_ssh.sh
