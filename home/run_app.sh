@@ -2,4 +2,5 @@
 
 wd="/app/nccl-tests/build"
 
-mpirun --pernode --host nccl-hpe,nccl-smartedge --wdir "$wd" ./all_gather_perf"
+mpirun -x NCCL_DEBUG=INFO --pernode --host smartedge,hpe \
+    /app/nccl-tests/build/all_gather_perf -n 100000
