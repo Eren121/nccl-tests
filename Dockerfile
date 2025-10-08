@@ -43,4 +43,6 @@ ENV NCCL_IB_GID_INDEX=${NCCL_IB_GID_INDEX}
 RUN chmod 600 /root/.ssh/environment
 RUN make -C $HOME/cpp
 
+RUN apt-get -y install nsight-systems-2025.3.2
+
 CMD $HOME/init_ssh.sh
