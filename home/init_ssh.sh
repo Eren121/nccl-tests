@@ -33,7 +33,7 @@ copy_ssh_key smartedge
 copy_ssh_key hpe
 
 if [ "$(hostname)" = "smartedge" ]; then
-    mpirun -x NCCL_DEBUG=INFO --pernode --host smartedge,hpe /app/nccl-tests/build/all_gather_perf -n 100000
+    mpirun -x NCCL_DEBUG=INFO --pernode --host smartedge,hpe /app/nccl-tests/build/all_gather_perf -n 100000 || true
 fi
 
 exec bash
