@@ -3,6 +3,7 @@ FROM nvcr.io/nvidia/doca/doca:3.1.0-devel-cuda12.8.0-host
 # https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/env.html
 ARG NCCL_IB_HCA
 ARG NCCL_IB_GID_INDEX
+ARG UCX_NET_DEVICES
 
 RUN apt-get -y update && apt-get -y upgrade
 RUN apt-get -y install openmpi-bin openmpi-common libopenmpi-dev librdmacm-dev libpsm2-dev openmpi-bin libopenmpi-dev git sshpass nsight-compute-2025.3.1
@@ -39,6 +40,9 @@ ENV NCCL_IB_HCA=${NCCL_IB_HCA}
 
 RUN echo "NCCL_IB_GID_INDEX=${NCCL_IB_GID_INDEX}" >> /root/.ssh/environment
 ENV NCCL_IB_GID_INDEX=${NCCL_IB_GID_INDEX}
+
+RUN echo "UCX_NET_DEVICES=${UCX_NET_DEVICES}" >> /root/.ssh/environment
+ENV UCX_NET_DEVICES=${UCX_NET_DEVICES}
 
 RUN chmod 600 /root/.ssh/environment
 RUN make -C $HOME/cpp

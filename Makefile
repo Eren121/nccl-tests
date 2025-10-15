@@ -12,12 +12,14 @@ MOUNT_OPT = --mount type=bind,src=$(HOME),dst=$(HOME)
 image_hpe:
 	docker build \
 		--build-arg NCCL_IB_HCA='=mlx5_2:1' \
+		--build-arg UCX_NET_DEVICES='mlx5_2:1' \
 		--build-arg NCCL_IB_GID_INDEX=3 \
 		-t $(IMAGE) .
 
 image_smartedge:
 	docker build \
 		--build-arg NCCL_IB_HCA='=mlx5_0:1' \
+		--build-arg UCX_NET_DEVICES='mlx5_0:1' \
 		--build-arg NCCL_IB_GID_INDEX=3 \
 		-t $(IMAGE) .
 
