@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
     }
     else {
         myRank = 1;
-        sock = connectToServer("192.168.120.1", 50001);
+        sock = connectToServer("192.168.200.10", 50001);
         recvNcclId(sock, id);
     }
 
