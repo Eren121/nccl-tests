@@ -1,16 +1,15 @@
 #include <stdio.h>
 #include <stdint.h>
-#include <mpi.h>
 #include <nccl.h>
 #include <cuda_runtime.h>
+#include <iostream>
+#include <cstring>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <nccl.h>
 
-#define MPICHECK(cmd) do { \
-    int e = cmd; \
-    if (e != MPI_SUCCESS) { \
-        fprintf(stderr, "MPI error %d at %s:%d\n", e, __FILE__, __LINE__); \
-        MPI_Abort(MPI_COMM_WORLD, e); \
-    } \
-} while(0)
 
 #define CUDACHECK(cmd) do { \
     cudaError_t e = cmd; \
@@ -28,28 +27,86 @@
     } \
 } while(0)
 
+// Send ncclUniqueId over a connected socket
+inline bool sendNcclId(int sock, const ncclUniqueId &id) {
+    ssize_t n = send(sock, &id, sizeof(id), 0);
+    return n == sizeof(id);
+}
+
+// Receive ncclUniqueId over a connected socket
+inline bool recvNcclId(int sock, ncclUniqueId &id) {
+    ssize_t n = recv(sock, &id, sizeof(id), 0);
+    return n == sizeof(id);
+}
+
+// Start TCP server and accept one connection
+inline int startServer(int port) {
+    int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (listen_fd < 0) { perror("socket"); return -1; }
+
+    sockaddr_in addr{};
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = INADDR_ANY;
+    addr.sin_port = htons(port);
+
+    if (bind(listen_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) { perror("bind"); return -1; }
+    if (listen(listen_fd, 1) < 0) { perror("listen"); return -1; }
+
+    std::cout << "Server listening on port " << port << "...\n";
+    int client_fd = accept(listen_fd, nullptr, nullptr);
+    if (client_fd < 0) { perror("accept"); return -1; }
+
+    close(listen_fd); // no longer need listening socket
+    return client_fd;
+}
+
+// Connect to TCP server
+inline int connectToServer(const char* ip, int port) {
+    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock < 0) { perror("socket"); return -1; }
+
+    sockaddr_in server_addr{};
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(port);
+    inet_pton(AF_INET, ip, &server_addr.sin_addr);
+
+    if (connect(sock, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+        perror("connect"); return -1;
+    }
+    return sock;
+}
+
 int main(int argc, char *argv[]) {
     int size = 32 * 1024 * 1024;  // buffer size
     int myRank, nRanks, localRank = 0;
-
-    // Initialize MPI
-    MPICHECK(MPI_Init(&argc, &argv));
-    MPICHECK(MPI_Comm_rank(MPI_COMM_WORLD, &myRank));
-    MPICHECK(MPI_Comm_size(MPI_COMM_WORLD, &nRanks));
 
     ncclUniqueId id;
     ncclComm_t comm;
     float *sendbuff, *recvbuff;
     cudaStream_t s;
 
-    // Rank 0 generates the NCCL unique ID
-    if (myRank == 0) {
+    char hostname[256];
+    gethostname(hostname, sizeof(hostname));
+    
+    int sock;
+
+    if(strcmp(hostname, "hpe") == 0) {
+        myRank = 0;
         NCCLCHECK(ncclGetUniqueId(&id));
+
+        sock = startServer(50001);
+        sendNcclId(sock, id);
+    }
+    else {
+        myRank = 1;
+        sock = connectToServer("192.168.120.1", 50001);
+        recvNcclId(sock, id);
     }
 
-    // Broadcast the NCCL unique ID to all ranks
-    MPICHECK(MPI_Bcast(&id, sizeof(ncclUniqueId), MPI_BYTE, 0, MPI_COMM_WORLD));
-
+    close(sock);
+    
+    nRanks = 2;
+    
     // Optional: print to confirm all ranks received it
     printf("Rank %d received NCCL unique ID\n", myRank);
 
@@ -91,7 +148,6 @@ int main(int argc, char *argv[]) {
     CUDACHECK(cudaFree(sendbuff));
     CUDACHECK(cudaFree(recvbuff));
     CUDACHECK(cudaStreamDestroy(s));
-    MPICHECK(MPI_Finalize());
 
     return 0;
 }
