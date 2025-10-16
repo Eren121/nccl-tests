@@ -45,7 +45,7 @@ RUN echo "UCX_NET_DEVICES=${UCX_NET_DEVICES}" >> /root/.ssh/environment
 ENV UCX_NET_DEVICES=${UCX_NET_DEVICES}
 
 RUN chmod 600 /root/.ssh/environment
-RUN make -C $HOME/cpp
+RUN make -C $HOME/cpp NVCUFLAGS='-O2 -g'
 
 RUN apt-get -y install nsight-systems-2025.3.2
 
