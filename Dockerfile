@@ -6,7 +6,7 @@ ARG NCCL_IB_GID_INDEX
 ARG UCX_NET_DEVICES
 
 RUN apt-get -y update && apt-get -y upgrade
-RUN apt-get -y install openmpi-bin openmpi-common libopenmpi-dev librdmacm-dev libpsm2-dev openmpi-bin libopenmpi-dev git sshpass nsight-compute-2025.3.1
+RUN apt-get -y install openmpi-bin openmpi-common libopenmpi-dev librdmacm-dev libpsm2-dev openmpi-bin libopenmpi-dev git sshpass nsight-compute-2025.3.1 nsight-systems-2025.3.2
 
 WORKDIR /app/nccl-tests
 RUN git clone https://github.com/NVIDIA/nccl-tests .
@@ -14,6 +14,7 @@ RUN make -j MPI=1 MPI_HOME=/usr/mpi/gcc/openmpi-4.1.9a1/
 
 ENV OMPI_ALLOW_RUN_AS_ROOT=1 
 ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
+
 #
 # ssh-server
 #
@@ -46,7 +47,5 @@ ENV UCX_NET_DEVICES=${UCX_NET_DEVICES}
 
 RUN chmod 600 /root/.ssh/environment
 RUN make -C $HOME/cpp NVCUFLAGS='-O2 -g'
-
-RUN apt-get -y install nsight-systems-2025.3.2
 
 CMD $HOME/init_ssh.sh
