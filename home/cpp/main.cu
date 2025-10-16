@@ -43,6 +43,10 @@ inline bool recvNcclId(int sock, ncclUniqueId &id) {
 inline int startServer(int port) {
     int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (listen_fd < 0) { perror("socket"); return -1; }
+    int opt = 1;
+    if (setsockopt(listen_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+        perror("setsockopt"); return -1;
+    }
 
     sockaddr_in addr{};
     addr.sin_family = AF_INET;
@@ -64,6 +68,10 @@ inline int startServer(int port) {
 inline int connectToServer(const char* ip, int port) {
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) { perror("socket"); return -1; }
+    int opt = 1;
+    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+        perror("setsockopt"); return -1;
+    }
 
     sockaddr_in server_addr{};
     server_addr.sin_family = AF_INET;
