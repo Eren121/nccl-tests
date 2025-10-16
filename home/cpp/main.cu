@@ -9,6 +9,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <nccl.h>
+#include <cuda_profiler_api.h>
 
 
 #define CUDACHECK(cmd) do { \
@@ -136,6 +137,9 @@ int main(int argc, char *argv[]) {
     // (for demonstration, could be random or rank-specific)
     CUDACHECK(cudaMemset(sendbuff, myRank, size * sizeof(float)));
 
+    CUDACHECK(cudaProfilerStart());
+    NCCLCHECK(ncclGroupStart());
+
     // Perform NCCL AllGather
     NCCLCHECK(ncclAllGather(
         (const void*)sendbuff,     // send buffer
@@ -146,6 +150,9 @@ int main(int argc, char *argv[]) {
         s                          // CUDA stream
     ));
 
+    NCCLCHECK(ncclGroupEnd());
+    CUDACHECK(cudaProfilerStop());
+    
     // Wait for completion
     CUDACHECK(cudaStreamSynchronize(s));
 
